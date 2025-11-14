@@ -28,6 +28,73 @@ Initially, you will need to ensure all required packages are installed on your
 computer. To ensure this the first time you use the infrastructure, use:
 
 ```{r eval = FALSE}
-...
+if (!require(here)) install.packages("here")
+if (!require(rio)) install.packages("rio")
+if (!require(tibble)) install.packages("tibble")
+if (!require(magrittr)) install.packages("magrittr")
 ```
+
+
+## Content of the repository
+
+The main files and folders of the repository include:
+
+- `README.Rmd`: the *rmarkdown* file generating the `README.md`
+- `README.md`: this file, serving as main documentation for the repository
+- `data/`: folder containing the cost data
+
+
+
+## Accessing cost data
+
+We import the data into the R session and convert it to a `tibble` for easier
+visualization:
+
+```{r}
+file_path <- here::here("data", "ebola_cost_data.xlsx")
+x <- rio::import(file_path) %>% 
+  tibble()
+names(x) <- epitrix::clean_labels(names(x))
+x
+```
+
+List of main accessible information:
+
+Outbreak data
+
+- pathogen: column `pathogen`
+
+- location the data was collected for: look for columns named `outbreak_location_country_outbreak_1_choice_[country]` that has a value 'checked'; 
+check other location info in "outbreak_location_province_state_region_outbreak_1" and
+"outbreak_location_village_municipality_city_outbreak_1" 
+
+- when the outbreak started: columns `grep("outbreak_start", names(x), value = TRUE)`
+
+- when the outbreak stopped: columns `grep("outbreak_end", names(x), value = TRUE)`
+
+- number of confirmed cases: column "number_of_confirmed_cases_outbreak_1"
+
+- number of deaths: column "number_of_deaths_outbreak_1" 
+
+- number of SDBs: column "number_of_safe_burials_outbreak_1"  
+
+- number of vaccinated: column "number_of_vaccines_administered_outbreak_1"
+
+- number of tests: column "number_of_tests_carried_out_outbreak_1"
+
+- number of ETU admissions: column "number_of_etu_admissions_outbreak_1"  
+
+- number of contacts traced: column "number_contacts_traced_outbreak_1"  
+
+Cost data:
+
+- cost category: columns `grep("cost_category", names(x), value = TRUE)`
+
+- cost estimate mean: columns `grep("cost_estimate_or_mean_cost_", names(x), value = TRUE)`
+
+- cost estimate lower bound: columns `grep("cost_range_lower_bound_", names(x), value = TRUE)`
+
+- cost estimate upper bound: columns `grep("cost_range_upper_bound_", names(x), value = TRUE)`
+
+- currency: columns `grep("currency_cost", names(x), value = TRUE)`
 
