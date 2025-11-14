@@ -66,8 +66,10 @@ get_end_date <- function(x) {
 
 get_outbreak_data <- function(x) {
   tibble(
+    record_id = x$record_id,
     pathogen = x$pathogen,
     locations = get_locations(x, TRUE), 
+    year = x$outbreak_end_year_outbreak_1,
     start_date = get_start_date(x),
     end_date = get_end_date(x),
     cases = x$number_of_confirmed_cases_outbreak_1,
