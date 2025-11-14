@@ -19,7 +19,7 @@ get_locations <- function(x, concatenate = FALSE) {
   )
   out <- apply(x[, cols_to_keep], 1, function(e) countries[e == "Checked"])
   if (concatenate) {
-    out <- lapply(temp, paste, collapse = ", ", sep = "")
+    out <- lapply(out, paste, collapse = ", ", sep = "")
     out <- unlist(out)
     out[out == ""] <- NA_character_
   }
