@@ -50,6 +50,9 @@ get_cost_estimate <- function(x) {
   )
   
   out <- x[, cols_to_keep]
+  ## some entries in this matrix are plain text, which is a problem; 
+  ## we regard these as NAs
+  out <- data.frame(lapply(out, function(e) suppressWarnings(as.numeric(e)))) # force convert to numeric
   names(out) <- paste("cost_estimate", seq_along(cols_to_keep), sep = "_")
   out
 }
@@ -97,6 +100,59 @@ get_cost_upper <- function(x) {
   
   out <- x[, cols_to_keep]
   names(out) <- paste("cost_upper", seq_along(cols_to_keep), sep = "_")
+  out
+}
+
+
+
+
+#' Get costs currency
+#' 
+#' This processes the 10 columns containing cost information for each row of the
+#' original database.
+#' 
+#' @inheritParams get_cost_category
+#' 
+get_cost_currency <- function(x) {
+  
+  cols_to_keep <- grep(
+    "currency_cost",
+    names(x),
+    value = TRUE
+  )
+  
+  out <- x[, cols_to_keep]
+  names(out) <- paste("cost_currency", seq_along(cols_to_keep), sep = "_")
+  out
+}
+
+
+
+#' Get costs summary
+#'
+#' Obtain a text summary of cost estimates. This processes the 10 columns
+#' containing cost information for each row of the original database.
+#'
+#' @inheritParams get_cost_category
+#' 
+get_cost_smry <- function(x) {
+  temp <- get_cost_estimate(x)
+  cost <- unlist(temp)
+  cost[is.na(cost)] <- ""
+  unit <- unlist(get_cost_currency(x))
+  unit[is.na(unit)] <- ""
+  main <- paste(unit, cost, sep = ": ")
+  # main[is.na(cost)] <- ""
+  
+  lower <- unlist(get_cost_lower(x))
+  upper <- unlist(get_cost_upper(x))
+  ci <- sprintf("[%s - %s]", lower, upper)
+  ci[is.na(lower)] <- ""
+  
+  out <- paste(main, ci)
+  dim(out) <- dim(temp)
+  out <- as.data.frame(out)
+  names(out) <- paste("cost_smry", seq_len(ncol(temp)), sep = "_")
   out
 }
 
