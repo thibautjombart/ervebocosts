@@ -1,0 +1,16 @@
+Package: ervebocost
+Title: Costing Data for the ERVEBO Project
+Version: 0.0.1
+Authors@R: 
+    c(person("Thibaut", "Jombart", , "thibautjombart@gmail.com", role = c("aut", "cre")))
+Description: Tools to extract costing data from a REDcap database for the ERVEBO project.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    dplyr,
+    epitrix,
+    here,
+    rio,
+    tibble
