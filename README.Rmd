@@ -103,10 +103,11 @@ x <- as.data.frame(x)
 ```
 
 ```{r }
+dim(x)
 head(x)
 ```
 
-This `data.frame` contains the following items:
+This `data.frame` contains `r nrow(x)` cost items (rows) broken down as:
 
 - `record_id`: unique ID of the record in the original REDCap database
 - `pathogen`: name of the pathogen the cost was recorded for

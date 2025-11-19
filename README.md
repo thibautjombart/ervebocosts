@@ -101,6 +101,8 @@ x <- as.data.frame(x)
 ```
 
 ``` r
+dim(x)
+#> [1] 269  18
 head(x)
 #>   record_id pathogen                        locations year start_date
 #> 1         6    Ebola                             <NA>   NA       <NA>
@@ -132,7 +134,7 @@ head(x)
 #> 6         NA         NA
 ```
 
-This `data.frame` contains the following items:
+This `data.frame` contains 269 cost items (rows) broken down as:
 
 - `record_id`: unique ID of the record in the original REDCap database
 - `pathogen`: name of the pathogen the cost was recorded for
