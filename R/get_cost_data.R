@@ -34,6 +34,18 @@ get_cost_category <- function(x) {
 
 
 
+#' Get cost sub-category
+#' 
+#' Unlike categories, these are free-text, not text boxes. Why be consistent, 
+#' huh?
+get_cost_subcategory <- function(x) {
+  to_keep <- grep("subcategory", names(x))
+  out <- x[, to_keep]
+  names(out) <- gsub("subcategory_cost", "subcategory", names(out)) 
+  out
+}
+
+
 #' Get costs estimates
 #' 
 #' This processes the 10 columns containing cost information for each row of the

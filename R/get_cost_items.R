@@ -15,6 +15,14 @@ get_cost_items <- function(x) {
     pivot_longer(-record_id, names_to = "item", values_to = "cost_category") %>% 
     mutate(item = as.integer(gsub("cost_category_", "", item)))
   
+  df_subcateg <- cbind(
+    df_outbreak_data, 
+    get_cost_subcategory(x)
+  ) %>% 
+    select(record_id, cost_subcategory_1:cost_subcategory_10) %>% 
+    pivot_longer(-record_id, names_to = "item", values_to = "cost_subcategory") %>% 
+    mutate(item = as.integer(gsub("cost_subcategory_", "", item)))
+  
   df_cost_smry <- cbind(
     df_outbreak_data, 
     get_cost_smry(x)
@@ -53,6 +61,7 @@ get_cost_items <- function(x) {
   
  
   out <- right_join(df_outbreak_data, df_categ, by = "record_id")
+  out <- full_join(out, df_subcateg, by = c("record_id", "item"))
   out <- full_join(out, df_cost_smry, by = c("record_id", "item"))
   out <- full_join(out, df_cost_estimate, by = c("record_id", "item"))
   out <- full_join(out, df_cost_lower, by = c("record_id", "item"))
