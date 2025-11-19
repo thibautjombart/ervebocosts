@@ -116,13 +116,13 @@ head(x)
 #> 4       <NA>    NA     NA   NA           NA     NA         NA              NA
 #> 5       <NA>    NA     NA   NA           NA     NA         NA              NA
 #> 6       <NA>    NA     NA   NA           NA     NA         NA              NA
-#>   item cost_category                               cost_summary cost_estimate
-#> 1    1         other                   US Dollar, USD: 7.5e+08      750000000
-#> 2    1         other                 US Dollar, USD: 143890000      143890000
-#> 3    1         other US Dollar, USD:  [6739550567 - 6739550567]            NA
-#> 4    1     personnel                                       <NA>            NA
-#> 5    1     personnel                                       <NA>            NA
-#> 6    2   vaccination                                       <NA>            NA
+#>   cost_category                               cost_summary cost_estimate
+#> 1         other                   US Dollar, USD: 7.5e+08      750000000
+#> 2         other                 US Dollar, USD: 143890000      143890000
+#> 3         other US Dollar, USD:  [6739550567 - 6739550567]            NA
+#> 4     personnel                                       <NA>            NA
+#> 5     personnel                                       <NA>            NA
+#> 6   vaccination                                       <NA>            NA
 #>   cost_lower cost_upper
 #> 1         NA         NA
 #> 2         NA         NA
@@ -131,6 +131,38 @@ head(x)
 #> 5         NA         NA
 #> 6         NA         NA
 ```
+
+This `data.frame` contains the following items:
+
+- `record_id`: unique ID of the record in the original REDCap database
+- `pathogen`: name of the pathogen the cost was recorded for
+- `locations`: all locations of the recorded costs
+- `year`: year the cost item was recorded
+- `start_data`: if the cost item was recorded during an outbreak, the
+  starting date of the outbreak
+- `end_data`: if the cost item was recorded during an outbreak, the end
+  date of the outbreak
+- `cases`: if the cost item was recorded during an outbreak, the number
+  of confirmed cases
+- `deaths`: if the cost item was recorded during an outbreak, the number
+  of deaths
+- `sdbs`: if the cost item was recorded during an outbreak, the number
+  of safe and dignified burials (SDBs)
+- `vaccination`: if the cost item was recorded during an outbreak, the
+  number of vaccine doses administered
+- `tests`: if the cost item was recorded during an outbreak, the number
+  of tests performed
+- `admissions`: if the cost item was recorded during an outbreak, the
+  number of admissions to healthcare facilities
+- `contact_traced`: if the cost item was recorded during an outbreak,
+  the number of contacts traced
+- `cost_category`: the type of activity the cost corresponds to
+- `cost_summary`: a text-summary of the cost estimates and confidence
+  intervals, if available, including currency used
+- `cost_estimate`: the numerical value of the central estimate of the
+  cost
+- `cost_lower`: the numerical value of the lower bound of the cost
+- `cost_upper`: the numerical value of the upper bound of the cost
 
 To subset data, we can use `dply::filter`. For instance, we can get data
 on Ebola-specific costs for IPC since 2018 using:
@@ -145,10 +177,10 @@ x %>%
 #> 1        29    Ebola democratic_republic_of_the_congo 2018 2018-08-08
 #>     end_date cases deaths sdbs vaccinations tests admissions contacts_traced
 #> 1 2018-12-09  9862     NA  666        43552    NA        132           27500
-#>   item cost_category                         cost_summary cost_estimate
-#> 1   10           ipc US Dollar, USD:  [1784000 - 1784000]            NA
-#>   cost_lower cost_upper
-#> 1    1784000    1784000
+#>   cost_category                         cost_summary cost_estimate cost_lower
+#> 1           ipc US Dollar, USD:  [1784000 - 1784000]            NA    1784000
+#>   cost_upper
+#> 1    1784000
 ```
 
 The list of documented cost categories in the database is:

@@ -57,6 +57,8 @@ get_cost_items <- function(x) {
   out <- full_join(out, df_cost_estimate, by = c("record_id", "item"))
   out <- full_join(out, df_cost_lower, by = c("record_id", "item"))
   out <- full_join(out, df_cost_upper, by = c("record_id", "item"))
+  
+  out <- filter(out, !is.na(cost_category) | !is.na(cost_summary))
+  out <- select(out, -item)
   out
-  filter(out, !is.na(cost_category) | !is.na(cost_summary))
 }
