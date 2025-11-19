@@ -3,6 +3,18 @@ output: github_document
 ---
 
 
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  warning = FALSE, 
+  message = FALSE
+)
+```
+
 # Welcome to the ERVEBOCOSTS repository
 
 This repository is dedicated to ...
@@ -70,8 +82,10 @@ as-is. We provide a series of functions for importing and processing the data
 in more usable formats. First, we import the data using the helper function
 `import_data()`
 
-```{r}
+```{r results = "hide"}
 raw_data <- import_data()
+```
+```{r}
 head(raw_data)
 ```
 
@@ -83,11 +97,16 @@ The content of the original database is outlined in the file `database_content.m
 The main helper function extracts (where available) data on the outbreaks and 
 documented cost items:
 
-```{r}
+```{r results = "hide"}
 x <- get_cost_items(raw_data)
 x <- as.data.frame(x)
+```
+
+```{r }
 head(x)
 ```
+
+
 
 To subset data, we can use `dply::filter`. For instance, we can get data on 
 Ebola-specific costs for IPC since 2018 using:
