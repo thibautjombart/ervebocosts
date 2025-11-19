@@ -54,6 +54,8 @@ get_cost_estimate <- function(x) {
   ## we regard these as NAs
   out <- data.frame(lapply(out, function(e) suppressWarnings(as.numeric(e)))) # force convert to numeric
   names(out) <- paste("cost_estimate", seq_along(cols_to_keep), sep = "_")
+  out <- mutate_all(out, as.numeric)
+  
   out
 }
 
@@ -77,6 +79,8 @@ get_cost_lower <- function(x) {
   
   out <- x[, cols_to_keep]
   names(out) <- paste("cost_lower", seq_along(cols_to_keep), sep = "_")
+  out <- mutate_all(out, as.numeric)
+  
   out
 }
 
@@ -100,6 +104,8 @@ get_cost_upper <- function(x) {
   
   out <- x[, cols_to_keep]
   names(out) <- paste("cost_upper", seq_along(cols_to_keep), sep = "_")
+  out <- mutate_all(out, as.numeric)
+  
   out
 }
 
@@ -153,6 +159,9 @@ get_cost_smry <- function(x) {
   dim(out) <- dim(temp)
   out <- as.data.frame(out)
   names(out) <- paste("cost_smry", seq_len(ncol(temp)), sep = "_")
+  
+  missing_entries <- out == ":  "
+  out[missing_entries] <- NA
   out
 }
 

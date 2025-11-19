@@ -1,9 +1,10 @@
 #' Import cost data
 #'
+#' 
 import_data <- function() {
   file_path <- here::here("data", "ebola_cost_data.xlsx")
-  x <- rio::import(file_path) %>% 
-    tibble()
+  x <- rio::import(file_path)
+  x <- tibble::tibble(x)
   names(x) <- epitrix::clean_labels(names(x))
   x
 }

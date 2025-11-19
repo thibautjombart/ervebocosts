@@ -42,59 +42,71 @@ The main files and folders of the repository include:
 - `README.Rmd`: the *rmarkdown* file generating the `README.md`
 - `README.md`: this file, serving as main documentation for the repository
 - `data/`: folder containing the cost data
+- `R/`: folder containing R helper functions to exploit the data
+
+
+
+## Loading helper functions
+
+To load helper functions, use:
+
+```{r }
+if (!require(devtools)) {
+  install.packages("devtools")
+}
+devtools::install_deps(dependencies = TRUE, upgrade = "never")
+devtools::load_all()
+library(dplyr)
+library(tibble)
+library(tidyr)
+```
 
 
 
 ## Accessing cost data
 
-We import the data into the R session and convert it to a `tibble` for easier
-visualization:
+Cost data are stored as an export of a REDCap database, which is awkward to use
+as-is. We provide a series of functions for importing and processing the data
+in more usable formats. First, we import the data using the helper function
+`import_data()`
 
 ```{r}
-file_path <- here::here("data", "ebola_cost_data.xlsx")
-x <- rio::import(file_path) %>% 
-  tibble()
-names(x) <- epitrix::clean_labels(names(x))
-x
+raw_data <- import_data()
+head(raw_data)
 ```
 
-List of main accessible information:
+The content of the original database is outlined in the file `database_content.md`.
 
-Outbreak data
 
-- pathogen: column `pathogen`
+## Getting cost items
 
-- location the data was collected for: look for columns named `outbreak_location_country_outbreak_1_choice_[country]` that has a value 'checked'; 
-check other location info in "outbreak_location_province_state_region_outbreak_1" and
-"outbreak_location_village_municipality_city_outbreak_1" 
+The main helper function extracts (where available) data on the outbreaks and 
+documented cost items:
 
-- when the outbreak started: columns `grep("outbreak_start", names(x), value = TRUE)`
+```{r}
+x <- get_cost_items(raw_data)
+x <- as.data.frame(x)
+head(x)
+```
 
-- when the outbreak stopped: columns `grep("outbreak_end", names(x), value = TRUE)`
+To subset data, we can use `dply::filter`. For instance, we can get data on 
+Ebola-specific costs for IPC since 2018 using:
+```{r}
+x %>% 
+  filter(pathogen == "Ebola", 
+         year >= 2018, 
+         cost_category == "ipc"
+         )
 
-- number of confirmed cases: column "number_of_confirmed_cases_outbreak_1"
+```
 
-- number of deaths: column "number_of_deaths_outbreak_1" 
+The list of documented cost categories in the database is:
+```{r}
+pull(x, "cost_category") %>% unique() %>% sort()
+```
 
-- number of SDBs: column "number_of_safe_burials_outbreak_1"  
 
-- number of vaccinated: column "number_of_vaccines_administered_outbreak_1"
 
-- number of tests: column "number_of_tests_carried_out_outbreak_1"
 
-- number of ETU admissions: column "number_of_etu_admissions_outbreak_1"  
 
-- number of contacts traced: column "number_contacts_traced_outbreak_1"  
-
-Cost data:
-
-- cost category: columns `grep("cost_category", names(x), value = TRUE)`
-
-- cost estimate mean: columns `grep("cost_estimate_or_mean_cost_", names(x), value = TRUE)`
-
-- cost estimate lower bound: columns `grep("cost_range_lower_bound_", names(x), value = TRUE)`
-
-- cost estimate upper bound: columns `grep("cost_range_upper_bound_", names(x), value = TRUE)`
-
-- currency: columns `grep("currency_cost", names(x), value = TRUE)`
 
