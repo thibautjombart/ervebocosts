@@ -90,7 +90,7 @@ head(raw_data)
 The content of the original database is outlined in the file
 `database_content.md`.
 
-## Getting cost items
+## Extracting cost items
 
 The main helper function extracts (where available) data on the
 outbreaks and documented cost items:
