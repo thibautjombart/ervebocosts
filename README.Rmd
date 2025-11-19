@@ -123,6 +123,7 @@ This `data.frame` contains `r nrow(x)` cost items (rows) broken down as:
 - `admissions`: if the cost item was recorded during an outbreak, the number of admissions to healthcare facilities
 - `contact_traced`: if the cost item was recorded during an outbreak, the number of contacts traced
 - `cost_category`: the type of activity the cost corresponds to
+- `cost_category`: finer-grain precisions on the activity the cost corresponds to
 - `cost_summary`: a text-summary of the cost estimates and confidence intervals, if available, including currency used
 - `cost_estimate`: the numerical value of the central estimate of the cost 
 - `cost_lower`: the numerical value of the lower bound of the cost
@@ -142,6 +143,12 @@ x %>%
 The list of documented cost categories in the database is:
 ```{r}
 pull(x, "cost_category") %>% unique() %>% sort()
+```
+`
+
+The list of documented cost subcategories in the database is:
+```{r}
+pull(x, "cost_subcategory") %>% unique() %>% sort()
 ```
 
 
