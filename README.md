@@ -1,7 +1,11 @@
 
 # Welcome to the ERVEBOCOSTS repository
 
-This repository is dedicated to …
+This repository is dedicated to extracting Ebola intervention cost data
+from a REDCap database instance (exported as an `xlsx` file). Cost data
+are stored in an awkward format, spread across varying numbers of
+columns, so this infrastructure provides helper functions for extracting
+information in a more user-friendly way.
 
 ## Getting started
 
@@ -20,16 +24,10 @@ git checkout main
 git pull
 ```
 
-The infrastructure is compatible with **R** version 4.5.2. Initially,
-you will need to ensure all required packages are installed on your
-computer. To ensure this the first time you use the infrastructure, use:
-
-``` r
-if (!require(here)) install.packages("here")
-if (!require(rio)) install.packages("rio")
-if (!require(tibble)) install.packages("tibble")
-if (!require(magrittr)) install.packages("magrittr")
-```
+The infrastructure is compatible with **R** version 4.5.2. Helper
+functions are distributed as a dedicated package, so you should not have
+to care about dependencies: these will be handled for you (see “Loading
+helper functions” below).
 
 ## Content of the repository
 
@@ -43,7 +41,7 @@ The main files and folders of the repository include:
 
 ## Loading helper functions
 
-To load helper functions, use:
+To load helper functions, and install all required dependencies, use:
 
 ``` r
 if (!require(devtools)) {
@@ -219,8 +217,6 @@ pull(x, "cost_category") %>% unique() %>% sort()
 #> [17] "surveillance"                                 
 #> [18] "vaccination"
 ```
-
-\`
 
 The list of documented cost subcategories in the database is:
 
