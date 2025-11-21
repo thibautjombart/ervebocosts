@@ -103,6 +103,9 @@ head(x)
 This `data.frame` contains `r nrow(x)` cost items (rows) broken down as:
 
 - `record_id`: unique ID of the record in the original REDCap database
+- `source_type`: the type of data source
+- `source_type_other`: more detailed information on data source
+- `source_link`: DOI or URL of the data source
 - `pathogen`: name of the pathogen the cost was recorded for
 - `locations`: all locations of the recorded costs
 - `year`: year the cost item was recorded

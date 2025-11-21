@@ -100,48 +100,58 @@ x <- as.data.frame(x)
 
 ``` r
 dim(x)
-#> [1] 269  19
+#> [1] 269  22
 head(x)
-#>   record_id pathogen                        locations year start_date
-#> 1         6    Ebola                             <NA>   NA       <NA>
-#> 2        14    Ebola democratic_republic_of_the_congo 2020 2018-08-01
-#> 3        20    Ebola    guinea, liberia, sierra_leone 2016       <NA>
-#> 4        24    Ebola                             <NA>   NA       <NA>
-#> 5        25    Ebola                             <NA>   NA       <NA>
-#> 6        25    Ebola                             <NA>   NA       <NA>
-#>     end_date cases deaths sdbs vaccinations  tests admissions contacts_traced
-#> 1       <NA>    NA     NA   NA           NA     NA         NA              NA
-#> 2 2020-06-20  3481   2299   NA       301785 244193       1264            2687
-#> 3       <NA>    NA  11310   NA           NA     NA         NA              NA
-#> 4       <NA>    NA     NA   NA           NA     NA         NA              NA
-#> 5       <NA>    NA     NA   NA           NA     NA         NA              NA
-#> 6       <NA>    NA     NA   NA           NA     NA         NA              NA
-#>   cost_category            cost_subcategory
-#> 1         other                    Military
-#> 2         other                        <NA>
-#> 3         other Non-Health Worker Mortality
-#> 4     personnel                        <NA>
-#> 5     personnel                        <NA>
-#> 6   vaccination                        <NA>
-#>                                 cost_summary cost_estimate cost_lower
-#> 1                   US Dollar, USD: 7.5e+08      750000000         NA
-#> 2                 US Dollar, USD: 143890000      143890000         NA
-#> 3 US Dollar, USD:  [6739550567 - 6739550567]            NA 6739550567
-#> 4                                       <NA>            NA         NA
-#> 5                                       <NA>            NA         NA
-#> 6                                       <NA>            NA         NA
-#>   cost_upper
-#> 1         NA
-#> 2         NA
-#> 3 6739550567
-#> 4         NA
-#> 5         NA
-#> 6         NA
+#>   record_id                     source_type source_type_other
+#> 1         6 Journal article (peer reviewed)              <NA>
+#> 2        14 Journal article (peer reviewed)              <NA>
+#> 3        20 Journal article (peer reviewed)              <NA>
+#> 4        24                            <NA>              <NA>
+#> 5        25                            <NA>              <NA>
+#> 6        25                            <NA>              <NA>
+#>                                source_link pathogen
+#> 1 https://dx.doi.org/10.1093/infdis/jiy213    Ebola
+#> 2                10.1136/bmjgh-2023-012660    Ebola
+#> 3                    10.1093/infdis/jiy213    Ebola
+#> 4                                     <NA>    Ebola
+#> 5                                     <NA>    Ebola
+#> 6                                     <NA>    Ebola
+#>                          locations year start_date   end_date cases deaths sdbs
+#> 1                             <NA>   NA       <NA>       <NA>    NA     NA   NA
+#> 2 democratic_republic_of_the_congo 2020 2018-08-01 2020-06-20  3481   2299   NA
+#> 3    guinea, liberia, sierra_leone 2016       <NA>       <NA>    NA  11310   NA
+#> 4                             <NA>   NA       <NA>       <NA>    NA     NA   NA
+#> 5                             <NA>   NA       <NA>       <NA>    NA     NA   NA
+#> 6                             <NA>   NA       <NA>       <NA>    NA     NA   NA
+#>   vaccinations  tests admissions contacts_traced cost_category
+#> 1           NA     NA         NA              NA         other
+#> 2       301785 244193       1264            2687         other
+#> 3           NA     NA         NA              NA         other
+#> 4           NA     NA         NA              NA     personnel
+#> 5           NA     NA         NA              NA     personnel
+#> 6           NA     NA         NA              NA   vaccination
+#>              cost_subcategory                               cost_summary
+#> 1                    Military                   US Dollar, USD: 7.5e+08 
+#> 2                        <NA>                 US Dollar, USD: 143890000 
+#> 3 Non-Health Worker Mortality US Dollar, USD:  [6739550567 - 6739550567]
+#> 4                        <NA>                                       <NA>
+#> 5                        <NA>                                       <NA>
+#> 6                        <NA>                                       <NA>
+#>   cost_estimate cost_lower cost_upper
+#> 1     750000000         NA         NA
+#> 2     143890000         NA         NA
+#> 3            NA 6739550567 6739550567
+#> 4            NA         NA         NA
+#> 5            NA         NA         NA
+#> 6            NA         NA         NA
 ```
 
 This `data.frame` contains 269 cost items (rows) broken down as:
 
 - `record_id`: unique ID of the record in the original REDCap database
+- `source_type`: the type of data source
+- `source_type_other`: more detailed information on data source
+- `source_link`: DOI or URL of the data source
 - `pathogen`: name of the pathogen the cost was recorded for
 - `locations`: all locations of the recorded costs
 - `year`: year the cost item was recorded
@@ -182,12 +192,14 @@ x %>%
          year >= 2018, 
          cost_category == "ipc"
          )
-#>   record_id pathogen                        locations year start_date
-#> 1        29    Ebola democratic_republic_of_the_congo 2018 2018-08-08
-#>     end_date cases deaths sdbs vaccinations tests admissions contacts_traced
-#> 1 2018-12-09  9862     NA  666        43552    NA        132           27500
-#>   cost_category
-#> 1           ipc
+#>   record_id source_type source_type_other
+#> 1        29      Report              <NA>
+#>                                                                                                               source_link
+#> 1 https://reliefweb.int/report/democratic-republic-congo/update-period-november-2018-january-2019-strategic-response-plan
+#>   pathogen                        locations year start_date   end_date cases
+#> 1    Ebola democratic_republic_of_the_congo 2018 2018-08-08 2018-12-09  9862
+#>   deaths sdbs vaccinations tests admissions contacts_traced cost_category
+#> 1     NA  666        43552    NA        132           27500           ipc
 #>                                                     cost_subcategory
 #> 1 Strengthening IPC/WASH in health centres, schools, and communities
 #>                           cost_summary cost_estimate cost_lower cost_upper
