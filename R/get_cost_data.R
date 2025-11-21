@@ -46,6 +46,56 @@ get_cost_subcategory <- function(x) {
 }
 
 
+#' Get cost type
+#' 
+#' Unlike categories, these are free-text, not text boxes. Why be consistent, 
+#' huh?
+get_cost_type <- function(x) {
+  to_keep <- grep("cost_type", names(x))
+  out <- x[, to_keep]
+  names(out) <- gsub("cost_type", "cost_type", names(out)) 
+  out
+}
+
+#' Get number of costs covered
+#' 
+#' numeric value of number of activities 
+get_number_activities <- function(x) {
+  to_keep <- grep("number_of_activities_captured_in_this_cost_cost_", names(x))
+  out <- x[, to_keep]
+  names(out) <- gsub("number_activities", "number_activities", names(out)) 
+  out
+}
+
+#' Get number of costs covered
+#' 
+#' strange mix of numeric and text 
+get_activities <- function(x,string='a') {
+  to_keep <- grep(paste0("please_specify_activities_within_this_cost_activity_",string,"_cost"), names(x))
+  out <- x[, to_keep]
+  names(out) <- gsub("number_activities", "number_activities", names(out)) 
+  out <- mutate_all(out, as.character)
+  out
+}
+
+#' Get number of costs covered
+#' 
+#' again strange mix of characters and doubles
+get_activities_count <- function(x,string='a') {
+  
+  if(string=='e')
+  {
+    to_keep <- grep(paste0("please_specify_the_activity_count_associated_with_this_activity_activity_",string,"_cost"), names(x))
+  } else {
+    to_keep <- grep(paste0("please_specify_the_activity_count_associated_with_this_cost_activity_",string,"_cost"), names(x))
+  }
+  
+  out <- x[, to_keep]
+  names(out) <- gsub("number_activities", "number_activities", names(out)) 
+  out <- mutate_all(out, as.character)
+  out
+}
+
 #' Get costs estimates
 #' 
 #' This processes the 10 columns containing cost information for each row of the
