@@ -64,6 +64,10 @@ devtools::load_all()
 library(dplyr)
 library(tibble)
 library(tidyr)
+library(ggplot2)
+library(stringr)
+library(patchwork)
+library(forcats)
 ```
 
 
@@ -147,7 +151,53 @@ The list of documented cost subcategories in the database is:
 pull(x, "cost_subcategory") %>% unique() %>% sort()
 ```
 
+Summary plot of the type of cost estimates captured:
 
+``` {r}
+x$cost_class     <- classify_cost(x)
+x$in_perspective <- cost_in_perspective(x)
+
+x_plot <- x %>% mutate( locations = replace_na(locations,"unspecified"),
+                        cost_category = replace_na(cost_category,"unspecified"),
+                        cost_category = str_to_title(str_replace_all(cost_category,"_"," "))) %>%
+                        group_by(cost_class,cost_category) 
+
+p1 <- ggplot() +
+    geom_bar(data = x_plot,
+             aes(x = reorder(fct_infreq(cost_category), cost_class), fill = cost_class), color = "black") +
+    scale_x_discrete(limits = rev) +
+    scale_y_continuous(limits = c(0,60), breaks = seq(0,60,by = 10), expand = c(0,0)) +
+    xlab("Cost Type") + ylab("Cost Count") +
+    scale_fill_viridis_d(option = "magma", begin=0.15, end=0.95, name = NULL) +
+    theme_minimal() +
+    theme(panel.border = element_rect(color = "black", size = 1.25, fill = NA),
+          legend.position = 'top' ) +
+    #legend.position = c(1,1), legend.justification = c(1,1), legend.box.just = "left") +
+    coord_flip()
+
+# NEED STUDY Year
+
+
+# NEED STUDY Type
+
+p4 <- ggplot() +
+  geom_bar(data =x_plot %>% separate_rows(locations, sep = ",") %>%
+             mutate(locations = str_trim(str_to_title(str_replace_all(locations,"_", " ")))),
+           aes(x = fct_infreq(locations), fill = cost_class), color = "black") +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0,180), breaks = seq(0,180,by = 30), expand = c(0,0)) +
+  xlab("Cost Country") + ylab("Cost Count") +
+  scale_fill_viridis_d(option = "magma", begin=0.15, end=0.95, name = NULL) +
+  theme_minimal() +
+  theme(panel.border = element_rect(color = "black", size = 1.25, fill = NA),
+        legend.position = 'none') +
+        #legend.position = 'bottom', legend.justification = c(1,1), legend.box.just = "left") +
+  coord_flip()
+
+patchwork <- p1 / p4 + plot_layout(ncol = 1,heights = c(4,2) )  +plot_annotation(tag_levels = 'A')
+
+patchwork
+```
 
 
 
