@@ -53,27 +53,24 @@ get_cost_subcategory <- function(x) {
 get_cost_type <- function(x) {
   to_keep <- grep("cost_type", names(x))
   out <- x[, to_keep]
-  names(out) <- gsub("cost_type", "cost_type", names(out)) 
   out
 }
 
-#' Get number of costs covered
+#' Get number of activities covered
 #' 
 #' numeric value of number of activities 
 get_number_activities <- function(x) {
   to_keep <- grep("number_of_activities_captured_in_this_cost_cost_", names(x))
   out <- x[, to_keep]
-  names(out) <- gsub("number_activities", "number_activities", names(out)) 
   out
 }
 
-#' Get number of costs covered
+#' Get activities covered
 #' 
 #' strange mix of numeric and text 
 get_activities <- function(x,string='a') {
   to_keep <- grep(paste0("please_specify_activities_within_this_cost_activity_",string,"_cost"), names(x))
   out <- x[, to_keep]
-  names(out) <- gsub("number_activities", "number_activities", names(out)) 
   out <- mutate_all(out, as.character)
   out
 }
@@ -91,7 +88,6 @@ get_activities_count <- function(x,string='a') {
   }
   
   out <- x[, to_keep]
-  names(out) <- gsub("number_activities", "number_activities", names(out)) 
   out <- mutate_all(out, as.character)
   out
 }
