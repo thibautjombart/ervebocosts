@@ -75,7 +75,7 @@ get_activities <- function(x,string='a') {
   out
 }
 
-#' Get number of costs covered
+#' Get activity count for sub-activities
 #' 
 #' again strange mix of characters and doubles
 get_activities_count <- function(x,string='a') {
