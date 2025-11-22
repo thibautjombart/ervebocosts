@@ -1,13 +1,13 @@
 
 
 #' Title classify_cost
+#' Classify cost items by type
 #'
 #' @param x tibble with all processed raw data from RedCap
 #'
 #' @returns vector of cost classifications into Fixed, Fixed variable, Variable or Unknown
 #' @export
-#'
-#' @examples 
+#' 
 classify_cost <- function(x){
   cost_class <- rep(NA, nrow(x))
   
@@ -32,13 +32,13 @@ classify_cost <- function(x){
 }
 
 #' Title cost_in_perspective
+#' Determine if cost is in analysis perspective
 #'
 #' @param x tibble with all processed raw data from RedCap
 #'
 #' @returns vector of zero or one if the cost item is in the perspective of the analysis
 #' @export
 #'
-#' @examples
 cost_in_perspective <- function(x){
   perspective <- rep(1, nrow(x))
   
