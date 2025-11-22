@@ -40,9 +40,10 @@ get_cost_items <- function(x) {
     mutate(item = as.integer(gsub("number_of_activities_captured_in_this_cost_cost_", "", item)))
   
   number_of_nested_activities <- 10
-  nested_activities       <- paste0('cost_activity_',letters[1:number_of_nested_activities])
-  nested_activities_count <- paste0('cost_activity_count_',letters[1:number_of_nested_activities])
   letters_in              <- letters[1:number_of_nested_activities]
+  
+  nested_activities_list <- list()
+  nested_activities_count_list <- list()
   
   for(i in 1:number_of_nested_activities)
   {
@@ -54,7 +55,7 @@ get_cost_items <- function(x) {
       pivot_longer(-record_id, names_to = "item", values_to = paste0("activities_description_",letters_in[i])) %>% 
       mutate(item = as.integer(gsub(paste0("please_specify_activities_within_this_cost_activity_",letters_in[i],"_cost_"), "", item)))
     
-    assign(nested_activities[i],tmp_activity)
+    nested_activities_list[[i]] <- tmp_activity
     
     if(letters_in[i]=='e')
     {
@@ -76,7 +77,7 @@ get_cost_items <- function(x) {
         mutate(item = as.integer(gsub(paste0("please_specify_the_activity_count_associated_with_this_cost_activity_",letters_in[i],"_cost_"), "", item)))
     }
     
-    assign(nested_activities_count[i],tmp_activity_count)
+    nested_activities_count_list[[i]] <- tmp_activity_count
   }
   
   df_cost_smry <- cbind(
@@ -123,8 +124,8 @@ get_cost_items <- function(x) {
   
   for(i in 1:number_of_nested_activities)
   {
-    out <- full_join(out, get(nested_activities[i]), by = c("record_id", "item"))
-    out <- full_join(out, get(nested_activities_count[i]), by = c("record_id", "item"))
+    out <- full_join(out, nested_activities_list[[i]], by = c("record_id", "item"))
+    out <- full_join(out, nested_activities_count_list[[i]], by = c("record_id", "item"))
   }
   
   out <- full_join(out, df_cost_smry, by = c("record_id", "item"))
