@@ -224,7 +224,7 @@ p2 <- ggplot() +
   geom_bar_pattern(
     data = x_plot,
     aes(
-      x = reorder(fct_infreq(display_year), cost_class),
+      x = fct_infreq(display_year),
       y = height,
       fill = cost_class,
       pattern = pattern        # NA = no pattern, "stripe" = stripes
