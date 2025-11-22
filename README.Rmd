@@ -175,7 +175,31 @@ x_plot <- x %>%
     height        = 1
   )
 
+# Reusable pattern styling parameters
+pattern_style <- list(
+  pattern_colour  = "black",
+  pattern_fill    = "black",
+  pattern_alpha   = 1,
+  pattern_angle   = 45,
+  pattern_density = 0.02,  # lower = thinner bands
+  pattern_spacing = 0.02,  # keep spacing reasonable
+  pattern_size    = 0.05   # lower = thinner stroke lines
+)
 
+# Reusable guides configuration
+cost_guides <- guides(
+  pattern = "none",                                        # hide pattern legend
+  fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+)
+
+# Reusable theme
+cost_theme <- function() {
+  theme_minimal() +
+    theme(
+      panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+      legend.position = "top"
+    )
+}
 
 p1 <- ggplot() +
   geom_bar_pattern(
@@ -190,17 +214,13 @@ p1 <- ggplot() +
     ),
     stat = "identity",
     color = NA,
-
-    # Thinner stripes (ignored when pattern = NA)
-    pattern_colour  = "black",
-    pattern_fill    = "black",
-    pattern_alpha   = 1,
-    pattern_angle   = 45,
-
-    # Make stripes thinner:
-    pattern_density = 0.02,  # lower = thinner bands 
-    pattern_spacing = 0.02,  # keep spacing reasonable
-    pattern_size    = 0.05   # lower = thinner stroke lines 
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
   ) +
   scale_x_discrete(limits = rev) +
   scale_y_continuous(limits = c(0, 60),
@@ -209,15 +229,8 @@ p1 <- ggplot() +
   xlab("Cost Type") + 
   ylab("Cost Count") +
   scale_fill_lancet(name = NULL) +
-  guides(
-    pattern = "none",                                  # hide pattern legend
-    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
-  ) +
-  theme_minimal() +
-  theme(
-    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
-    legend.position = "top"
-  ) +
+  cost_guides +
+  cost_theme() +
   coord_flip()
 
 p2 <- ggplot() +
@@ -227,21 +240,17 @@ p2 <- ggplot() +
       x = fct_infreq(display_year),
       y = height,
       fill = cost_class,
-      pattern = pattern        # NA = no pattern, "stripe" = stripes
+      pattern = pattern
     ),
     stat = "identity",
     color = NA,
-
-    # Thinner stripes (ignored when pattern = NA)
-    pattern_colour  = "black",
-    pattern_fill    = "black",
-    pattern_alpha   = 1,
-    pattern_angle   = 45,
-
-    # Make stripes thinner
-    pattern_density = 0.02,  # lower = thinner bands
-    pattern_spacing = 0.02,  # overall spacing
-    pattern_size    = 0.05   # thinner stroke lines
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
   ) +
   scale_x_discrete(limits = rev) +
   scale_y_continuous(limits = c(0, 100),
@@ -250,15 +259,8 @@ p2 <- ggplot() +
   xlab("Cost Year") + 
   ylab("Cost Count") +
   scale_fill_lancet(name = NULL) +
-  guides(
-    pattern = "none",                                        # hide pattern legend
-    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
-  ) +
-  theme_minimal() +
-  theme(
-    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
-    legend.position = "top"
-  ) +
+  cost_guides +
+  cost_theme() +
   coord_flip()
 
 
@@ -269,21 +271,17 @@ p3 <- ggplot() +
       x = reorder(fct_infreq(source_type), cost_class),
       y = height,
       fill = cost_class,
-      pattern = pattern        # NA = no pattern, "stripe" = stripes
+      pattern = pattern
     ),
     stat = "identity",
     color = NA,
-
-    # Thinner stripes (ignored when pattern = NA)
-    pattern_colour  = "black",
-    pattern_fill    = "black",
-    pattern_alpha   = 1,
-    pattern_angle   = 45,
-
-    # Make stripes thinner
-    pattern_density = 0.02,  # lower = thinner bands
-    pattern_spacing = 0.02,  # overall spacing
-    pattern_size    = 0.05   # thinner stroke lines
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
   ) +
   scale_x_discrete(limits = rev) +
   scale_y_continuous(limits = c(0, 150),
@@ -292,15 +290,8 @@ p3 <- ggplot() +
   xlab("Cost by Source Type") + 
   ylab("Cost Count") +
   scale_fill_lancet(name = NULL) +
-  guides(
-    pattern = "none",                                        # hide pattern legend
-    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
-  ) +
-  theme_minimal() +
-  theme(
-    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
-    legend.position = "top"
-  ) +
+  cost_guides +
+  cost_theme() +
   coord_flip()
 
 # By cost country -- note that the not in perspective looks larger than in the other plots as those 
@@ -314,21 +305,17 @@ p4 <- ggplot() +
       x = reorder(fct_infreq(locations), cost_class),
       y = height,
       fill = cost_class,
-      pattern = pattern        # NA = no pattern, "stripe" = stripes
+      pattern = pattern
     ),
     stat = "identity",
     color = NA,
-
-    # Thinner stripes (ignored when pattern = NA)
-    pattern_colour  = "black",
-    pattern_fill    = "black",
-    pattern_alpha   = 1,
-    pattern_angle   = 45,
-
-    # Make stripes thinner
-    pattern_density = 0.02,  # lower = thinner bands
-    pattern_spacing = 0.02,  # overall spacing
-    pattern_size    = 0.05   # thinner stroke lines
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
   ) +
   scale_x_discrete(limits = rev) +
   scale_y_continuous(limits = c(0, 120),
@@ -337,15 +324,8 @@ p4 <- ggplot() +
   xlab("Cost Country") + 
   ylab("Cost Count") +
   scale_fill_lancet(name = NULL) +
-  guides(
-    pattern = "none",                                        # hide pattern legend
-    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
-  ) +
-  theme_minimal() +
-  theme(
-    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
-    legend.position = "top"
-  ) +
+  cost_guides +
+  cost_theme() +
   coord_flip()
 
 
