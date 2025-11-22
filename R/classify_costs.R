@@ -1,6 +1,5 @@
 
 
-#' Title classify_cost
 #' Classify cost items by type
 #'
 #' @param x tibble with all processed raw data from RedCap
