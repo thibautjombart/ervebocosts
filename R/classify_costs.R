@@ -8,25 +8,12 @@
 #' @export
 #' 
 classify_cost <- function(x){
-  cost_class <- rep(NA, nrow(x))
-  
-  for(i in 1:nrow(x)){
-    cost_type <- x$cost_type[i]
-    num_act   <- x$number_activities[i]
-    
-    ## PLACEHOLDER ONLY: JS to fill in logic
-    
-    if(!is.na(cost_type) & cost_type == "Unit cost"){
-      cost_class[i] <- "Variable"
-    } else if(!is.na(num_act) & num_act > 1){
-      cost_class[i] <- "Fixed Variable"
-    } else if(!is.na(num_act) & num_act == 1){
-      cost_class[i] <- "Fixed"
-    } else {
-      cost_class[i] <- "Unknown"
-    }
-  }
-  
+  cost_class <- dplyr::case_when(
+    !is.na(x$cost_type) & x$cost_type == "Unit cost" ~ "Variable",
+    !is.na(x$number_activities) & x$number_activities > 1 ~ "Fixed Variable",
+    !is.na(x$number_activities) & x$number_activities == 1 ~ "Fixed",
+    TRUE ~ "Unknown"
+  )
   return(cost_class)
 }
 
