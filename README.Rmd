@@ -68,6 +68,8 @@ library(ggplot2)
 library(stringr)
 library(patchwork)
 library(forcats)
+library(ggsci)
+library(ggpattern)
 ```
 
 
@@ -154,49 +156,212 @@ pull(x, "cost_subcategory") %>% unique() %>% sort()
 Summary plot of the type of cost estimates captured:
 
 ``` {r}
+x <- get_cost_items(raw_data)
+
 x$cost_class     <- classify_cost(x)
 x$in_perspective <- cost_in_perspective(x)
 
-x_plot <- x %>% mutate( locations = replace_na(locations,"unspecified"),
-                        cost_category = replace_na(cost_category,"unspecified"),
-                        cost_category = str_to_title(str_replace_all(cost_category,"_"," "))) %>%
-                        group_by(cost_class,cost_category) 
+x$source_type[!is.na(x$source_type) & x$source_type == "Other"] <- x$source_type_other[!is.na(x$source_type) & x$source_type == "Other"]
+# Context: R + ggplot2 + ggpattern
+x_plot <- x %>% 
+  mutate(
+    locations     = replace_na(locations, "Unspecified"),
+    cost_category = replace_na(cost_category, "Unspecified"),
+    source_type   = replace_na(source_type, "Unspecified"),
+    source_type   = str_to_title(str_trim(source_type)),
+    display_year  = if_else(!is.na(year), as.character(year), "Unspecified"),
+    cost_category = str_to_title(str_replace_all(cost_category, "_", " ")),
+    pattern       = if_else(in_perspective == 1, NA_character_, "stripe"),
+    height        = 1
+  )
+
+
 
 p1 <- ggplot() +
-    geom_bar(data = x_plot,
-             aes(x = reorder(fct_infreq(cost_category), cost_class), fill = cost_class), color = "black") +
-    scale_x_discrete(limits = rev) +
-    scale_y_continuous(limits = c(0,60), breaks = seq(0,60,by = 10), expand = c(0,0)) +
-    xlab("Cost Type") + ylab("Cost Count") +
-    scale_fill_viridis_d(option = "magma", begin=0.15, end=0.95, name = NULL) +
-    theme_minimal() +
-    theme(panel.border = element_rect(color = "black", size = 1.25, fill = NA),
-          legend.position = 'top' ) +
-    #legend.position = c(1,1), legend.justification = c(1,1), legend.box.just = "left") +
-    coord_flip()
+  geom_bar_pattern(
+    data = x_plot %>% 
+      separate_rows(cost_category, sep = ",") %>%
+      mutate(cost_category = str_trim(cost_category)),
+    aes(
+      x = reorder(fct_infreq(cost_category), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern
+    ),
+    stat = "identity",
+    color = NA,
 
-# NEED STUDY Year
+    # Thinner stripes (ignored when pattern = NA)
+    pattern_colour  = "black",
+    pattern_fill    = "black",
+    pattern_alpha   = 1,
+    pattern_angle   = 45,
 
-
-# NEED STUDY Type
-
-p4 <- ggplot() +
-  geom_bar(data =x_plot %>% separate_rows(locations, sep = ",") %>%
-             mutate(locations = str_trim(str_to_title(str_replace_all(locations,"_", " ")))),
-           aes(x = fct_infreq(locations), fill = cost_class), color = "black") +
+    # Make stripes thinner:
+    pattern_density = 0.02,  # lower = thinner bands 
+    pattern_spacing = 0.02,  # keep spacing reasonable
+    pattern_size    = 0.05   # lower = thinner stroke lines 
+  ) +
   scale_x_discrete(limits = rev) +
-  scale_y_continuous(limits = c(0,180), breaks = seq(0,180,by = 30), expand = c(0,0)) +
-  xlab("Cost Country") + ylab("Cost Count") +
-  scale_fill_viridis_d(option = "magma", begin=0.15, end=0.95, name = NULL) +
+  scale_y_continuous(limits = c(0, 60),
+                     breaks = seq(0, 60, 10),
+                     expand = c(0,0)) +
+  xlab("Cost Type") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  guides(
+    pattern = "none",                                  # hide pattern legend
+    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+  ) +
   theme_minimal() +
-  theme(panel.border = element_rect(color = "black", size = 1.25, fill = NA),
-        legend.position = 'none') +
-        #legend.position = 'bottom', legend.justification = c(1,1), legend.box.just = "left") +
+  theme(
+    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+    legend.position = "top"
+  ) +
   coord_flip()
 
-patchwork <- p1 / p4 + plot_layout(ncol = 1,heights = c(4,2) )  +plot_annotation(tag_levels = 'A')
+p2 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot,
+    aes(
+      x = reorder(fct_infreq(display_year), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern        # NA = no pattern, "stripe" = stripes
+    ),
+    stat = "identity",
+    color = NA,
 
-patchwork
+    # Thinner stripes (ignored when pattern = NA)
+    pattern_colour  = "black",
+    pattern_fill    = "black",
+    pattern_alpha   = 1,
+    pattern_angle   = 45,
+
+    # Make stripes thinner
+    pattern_density = 0.02,  # lower = thinner bands
+    pattern_spacing = 0.02,  # overall spacing
+    pattern_size    = 0.05   # thinner stroke lines
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost Year") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  guides(
+    pattern = "none",                                        # hide pattern legend
+    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+  ) +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+    legend.position = "top"
+  ) +
+  coord_flip()
+
+
+p3 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot,
+    aes(
+      x = reorder(fct_infreq(source_type), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern        # NA = no pattern, "stripe" = stripes
+    ),
+    stat = "identity",
+    color = NA,
+
+    # Thinner stripes (ignored when pattern = NA)
+    pattern_colour  = "black",
+    pattern_fill    = "black",
+    pattern_alpha   = 1,
+    pattern_angle   = 45,
+
+    # Make stripes thinner
+    pattern_density = 0.02,  # lower = thinner bands
+    pattern_spacing = 0.02,  # overall spacing
+    pattern_size    = 0.05   # thinner stroke lines
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 150),
+                     breaks = seq(0, 150, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost by Source Type") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  guides(
+    pattern = "none",                                        # hide pattern legend
+    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+  ) +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+    legend.position = "top"
+  ) +
+  coord_flip()
+
+# By cost country -- note that the not in perspective looks larger than in the other plots as those 
+# estimates were jointly reported across all of those countries.
+p4 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot %>%
+      separate_rows(locations, sep = ",") %>%
+      mutate(locations = str_trim(str_to_title(str_replace_all(locations, "_", " ")))),
+    aes(
+      x = reorder(fct_infreq(locations), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern        # NA = no pattern, "stripe" = stripes
+    ),
+    stat = "identity",
+    color = NA,
+
+    # Thinner stripes (ignored when pattern = NA)
+    pattern_colour  = "black",
+    pattern_fill    = "black",
+    pattern_alpha   = 1,
+    pattern_angle   = 45,
+
+    # Make stripes thinner
+    pattern_density = 0.02,  # lower = thinner bands
+    pattern_spacing = 0.02,  # overall spacing
+    pattern_size    = 0.05   # thinner stroke lines
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 120),
+                     breaks = seq(0, 120, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost Country") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  guides(
+    pattern = "none",                                        # hide pattern legend
+    fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+  ) +
+  theme_minimal() +
+  theme(
+    panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+    legend.position = "top"
+  ) +
+  coord_flip()
+
+
+patchwork_plt <- (
+  p1 / p2 / p3 / p4
+) +
+  plot_layout(ncol = 1, heights = c(3, 2, 2, 2), guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(
+    legend.position = "top",               # shared legend at top
+    plot.tag = element_text(face = "bold") # bold A/B/C/D tags
+  )
+
+ggsave("man/figures/cost_count_figure.png", patchwork_plt, width = 8, height = 12, dpi = 300)
+
+knitr::include_graphics("man/figures/cost_count_figure.png")
 ```
 
 
