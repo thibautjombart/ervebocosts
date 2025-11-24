@@ -32,7 +32,15 @@ get_cost_category <- function(x) {
 }
 
 
-
+#' get cost category other
+#' 
+#' Unlike categories, these are free-text, not text boxes. Why be consistent, 
+#' huh?
+get_cost_category_other <- function(x) {
+  to_keep <- grep("please_specify_other_cost", names(x))
+  out <- x[, to_keep]
+  out
+}
 
 #' Get cost sub-category
 #' 
