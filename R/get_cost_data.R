@@ -32,7 +32,15 @@ get_cost_category <- function(x) {
 }
 
 
-
+#' get cost category other
+#' 
+#' Unlike categories, these are free-text, not text boxes. Why be consistent, 
+#' huh?
+get_cost_category_other <- function(x) {
+  to_keep <- grep("please_specify_other_cost", names(x))
+  out <- x[, to_keep]
+  out
+}
 
 #' Get cost sub-category
 #' 
@@ -45,6 +53,56 @@ get_cost_subcategory <- function(x) {
   out
 }
 
+
+#' Get cost type
+#' 
+#' Unlike categories, these are free-text, not text boxes. Why be consistent, 
+#' huh?
+#' @param x the imported database as returned by [import_data]
+get_cost_type <- function(x) {
+  to_keep <- grep("cost_type", names(x))
+  out <- x[, to_keep]
+  out
+}
+
+#' Get number of activities covered
+#' 
+#' Extracts the numeric value(s) indicating how many distinct activities are captured within each cost entry in the dataset.
+#' 
+#' @param x The imported database as returned by [import_data].
+#' @return A data frame (or vector) containing the number of activities associated with each cost entry, as recorded in the relevant column(s) of the input data.
+get_number_activities <- function(x) {
+  to_keep <- grep("number_of_activities_captured_in_this_cost_cost_", names(x))
+  out <- x[, to_keep]
+  out
+}
+
+#' Get activities covered
+#' 
+#' strange mix of numeric and text 
+get_activities <- function(x,string='a') {
+  to_keep <- grep(paste0("please_specify_activities_within_this_cost_activity_",string,"_cost"), names(x))
+  out <- x[, to_keep]
+  out <- mutate_all(out, as.character)
+  out
+}
+
+#' Get activity count for sub-activities
+#' 
+#' again strange mix of characters and doubles
+get_activities_count <- function(x,string='a') {
+  
+  if(string=='e')
+  {
+    to_keep <- grep(paste0("please_specify_the_activity_count_associated_with_this_activity_activity_",string,"_cost"), names(x))
+  } else {
+    to_keep <- grep(paste0("please_specify_the_activity_count_associated_with_this_cost_activity_",string,"_cost"), names(x))
+  }
+  
+  out <- x[, to_keep]
+  out <- mutate_all(out, as.character)
+  out
+}
 
 #' Get costs estimates
 #' 
