@@ -58,6 +58,7 @@ get_cost_subcategory <- function(x) {
 #' 
 #' Unlike categories, these are free-text, not text boxes. Why be consistent, 
 #' huh?
+#' @param x the imported database as returned by [import_data]
 get_cost_type <- function(x) {
   to_keep <- grep("cost_type", names(x))
   out <- x[, to_keep]
