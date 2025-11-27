@@ -52,6 +52,12 @@ devtools::load_all()
 library(dplyr)
 library(tibble)
 library(tidyr)
+library(ggplot2)
+library(stringr)
+library(patchwork)
+library(forcats)
+library(ggsci)
+library(ggpattern)
 ```
 
 ## Accessing cost data
@@ -100,7 +106,7 @@ x <- as.data.frame(x)
 
 ``` r
 dim(x)
-#> [1] 269  22
+#> [1] 269  45
 head(x)
 #>   record_id                     source_type source_type_other
 #> 1         6 Journal article (peer reviewed)              <NA>
@@ -130,20 +136,83 @@ head(x)
 #> 4           NA     NA         NA              NA     personnel
 #> 5           NA     NA         NA              NA     personnel
 #> 6           NA     NA         NA              NA   vaccination
-#>              cost_subcategory                               cost_summary
-#> 1                    Military                   US Dollar, USD: 7.5e+08 
-#> 2                        <NA>                 US Dollar, USD: 143890000 
-#> 3 Non-Health Worker Mortality US Dollar, USD:  [6739550567 - 6739550567]
-#> 4                        <NA>                                       <NA>
-#> 5                        <NA>                                       <NA>
-#> 6                        <NA>                                       <NA>
-#>   cost_estimate cost_lower cost_upper
-#> 1     750000000         NA         NA
-#> 2     143890000         NA         NA
-#> 3            NA 6739550567 6739550567
-#> 4            NA         NA         NA
-#> 5            NA         NA         NA
-#> 6            NA         NA         NA
+#>                                                  cost_category_other
+#> 1 Mixture of Personnel, Construction, Logistics, and Health Supplies
+#> 2                                                       Coordination
+#> 3                                                  Productivity Loss
+#> 4                                                               <NA>
+#> 5                                                               <NA>
+#> 6                                                               <NA>
+#>              cost_subcategory   cost_type number_activities
+#> 1                    Military     Mixture                 5
+#> 2                        <NA>     Mixture                 1
+#> 3 Non-Health Worker Mortality Operational                 1
+#> 4                        <NA>        <NA>                NA
+#> 5                        <NA> Operational                 2
+#> 6                        <NA> Operational                 2
+#>                                                                   activities_description_a
+#> 1                                                                               ETUs built
+#> 2 Support for Emergency Operations Centre at teh central, provincial and health zone level
+#> 3                                                              Non-Health Worker Mortality
+#> 4                                                                                     <NA>
+#> 5                                                                                     <NA>
+#> 6                                                                                      aaa
+#>   activities_count_a activities_description_b activities_count_b
+#> 1               <NA>                     <NA>               <NA>
+#> 2               <NA>                     <NA>               <NA>
+#> 3              10797                     <NA>               <NA>
+#> 4               <NA>                     <NA>               <NA>
+#> 5               <NA>                     <NA>               <NA>
+#> 6                111                      bbb                222
+#>   activities_description_c activities_count_c activities_description_d
+#> 1                     <NA>               <NA>                     <NA>
+#> 2                     <NA>               <NA>                     <NA>
+#> 3                     <NA>               <NA>                     <NA>
+#> 4                     <NA>               <NA>                     <NA>
+#> 5                     <NA>               <NA>                     <NA>
+#> 6                     <NA>               <NA>                     <NA>
+#>   activities_count_d activities_description_e activities_count_e
+#> 1               <NA>                     <NA>               <NA>
+#> 2               <NA>                     <NA>               <NA>
+#> 3               <NA>                     <NA>               <NA>
+#> 4               <NA>                     <NA>               <NA>
+#> 5               <NA>                     <NA>               <NA>
+#> 6               <NA>                     <NA>               <NA>
+#>   activities_description_f activities_count_f activities_description_g
+#> 1                     <NA>               <NA>                     <NA>
+#> 2                     <NA>               <NA>                     <NA>
+#> 3                     <NA>               <NA>                     <NA>
+#> 4                     <NA>               <NA>                     <NA>
+#> 5                     <NA>               <NA>                     <NA>
+#> 6                     <NA>               <NA>                     <NA>
+#>   activities_count_g activities_description_h activities_count_h
+#> 1               <NA>                     <NA>               <NA>
+#> 2               <NA>                     <NA>               <NA>
+#> 3               <NA>                     <NA>               <NA>
+#> 4               <NA>                     <NA>               <NA>
+#> 5               <NA>                     <NA>               <NA>
+#> 6               <NA>                     <NA>               <NA>
+#>   activities_description_i activities_count_i activities_description_j
+#> 1                     <NA>               <NA>                     <NA>
+#> 2                     <NA>               <NA>                     <NA>
+#> 3                     <NA>               <NA>                     <NA>
+#> 4                     <NA>               <NA>                     <NA>
+#> 5                     <NA>               <NA>                     <NA>
+#> 6                     <NA>               <NA>                     <NA>
+#>   activities_count_j                               cost_summary cost_estimate
+#> 1               <NA>                   US Dollar, USD: 7.5e+08      750000000
+#> 2               <NA>                 US Dollar, USD: 143890000      143890000
+#> 3               <NA> US Dollar, USD:  [6739550567 - 6739550567]            NA
+#> 4               <NA>                                       <NA>            NA
+#> 5               <NA>                                       <NA>            NA
+#> 6               <NA>                                       <NA>            NA
+#>   cost_lower cost_upper
+#> 1         NA         NA
+#> 2         NA         NA
+#> 3 6739550567 6739550567
+#> 4         NA         NA
+#> 5         NA         NA
+#> 6         NA         NA
 ```
 
 This `data.frame` contains 269 cost items (rows) broken down as:
@@ -200,8 +269,28 @@ x %>%
 #> 1    Ebola democratic_republic_of_the_congo 2018 2018-08-08 2018-12-09  9862
 #>   deaths sdbs vaccinations tests admissions contacts_traced cost_category
 #> 1     NA  666        43552    NA        132           27500           ipc
-#>                                                     cost_subcategory
+#>   cost_category_other
+#> 1                <NA>
+#>                                                     cost_subcategory cost_type
+#> 1 Strengthening IPC/WASH in health centres, schools, and communities     Setup
+#>   number_activities
+#> 1                 1
+#>                                             activities_description_a
 #> 1 Strengthening IPC/WASH in health centres, schools, and communities
+#>                                                                                                            activities_count_a
+#> 1 13 targeted communities in Komanda for IPC/WASH, 42 targeted schools for IPC/WASH in Komanda, 91 targeted health facilities
+#>   activities_description_b activities_count_b activities_description_c
+#> 1                     <NA>               <NA>                     <NA>
+#>   activities_count_c activities_description_d activities_count_d
+#> 1               <NA>                     <NA>               <NA>
+#>   activities_description_e activities_count_e activities_description_f
+#> 1                     <NA>               <NA>                     <NA>
+#>   activities_count_f activities_description_g activities_count_g
+#> 1               <NA>                     <NA>               <NA>
+#>   activities_description_h activities_count_h activities_description_i
+#> 1                     <NA>               <NA>                     <NA>
+#>   activities_count_i activities_description_j activities_count_j
+#> 1               <NA>                     <NA>               <NA>
 #>                           cost_summary cost_estimate cost_lower cost_upper
 #> 1 US Dollar, USD:  [1784000 - 1784000]            NA    1784000    1784000
 ```
@@ -283,8 +372,8 @@ pull(x, "cost_subcategory") %>% unique() %>% sort()
 #>  [47] "ETC Construction/Facility Modifications"                                                                             
 #>  [48] "ETC Set-Up"                                                                                                          
 #>  [49] "ETC Unit Planning"                                                                                                   
-#>  [50] "ETU Set-Up"                                                                                                          
-#>  [51] "ETU Set Up"                                                                                                          
+#>  [50] "ETU Set Up"                                                                                                          
+#>  [51] "ETU Set-Up"                                                                                                          
 #>  [52] "Europe Isolation Facility Preparation"                                                                               
 #>  [53] "EWARS Total"                                                                                                         
 #>  [54] "Face Shields"                                                                                                        
@@ -377,3 +466,196 @@ pull(x, "cost_subcategory") %>% unique() %>% sort()
 #> [141] "Vaccine Kit"                                                                                                         
 #> [142] "Vaccine Storage and Management"
 ```
+
+Summary plot of the type of cost estimates captured:
+
+``` r
+x <- get_cost_items(raw_data)
+
+x$cost_class     <- classify_cost(x)
+x$in_perspective <- cost_in_perspective(x)
+
+x$source_type[!is.na(x$source_type) & x$source_type == "Other"] <- x$source_type_other[!is.na(x$source_type) & x$source_type == "Other"]
+# Context: R + ggplot2 + ggpattern
+x_plot <- x %>% 
+  mutate(
+    locations     = replace_na(locations, "Unspecified"),
+    cost_category = replace_na(cost_category, "Unspecified"),
+    source_type   = replace_na(source_type, "Unspecified"),
+    source_type   = str_to_title(str_trim(source_type)),
+    display_year  = if_else(!is.na(year), as.character(year), "Unspecified"),
+    cost_category = str_to_title(str_replace_all(cost_category, "_", " ")),
+    pattern       = if_else(in_perspective == 1, NA_character_, "stripe"),
+    height        = 1
+  )
+
+# Reusable pattern styling parameters
+pattern_style <- list(
+  pattern_colour  = "black",
+  pattern_fill    = "black",
+  pattern_alpha   = 1,
+  pattern_angle   = 45,
+  pattern_density = 0.02,  # lower = thinner bands
+  pattern_spacing = 0.02,  # keep spacing reasonable
+  pattern_size    = 0.05   # lower = thinner stroke lines
+)
+
+# Reusable guides configuration
+cost_guides <- guides(
+  pattern = "none",                                        # hide pattern legend
+  fill    = guide_legend(override.aes = list(pattern = "none")) # solid legend keys
+)
+
+# Reusable theme
+cost_theme <- function() {
+  theme_minimal() +
+    theme(
+      panel.border = element_rect(color = "black", linewidth = 1.25, fill = NA),
+      legend.position = "top"
+    )
+}
+
+p1 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot %>% 
+      separate_rows(cost_category, sep = ",") %>%
+      mutate(cost_category = str_trim(cost_category)),
+    aes(
+      x = reorder(fct_infreq(cost_category), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern
+    ),
+    stat = "identity",
+    color = NA,
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 60),
+                     breaks = seq(0, 60, 10),
+                     expand = c(0,0)) +
+  xlab("Cost Type") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  cost_guides +
+  cost_theme() +
+  coord_flip()
+
+p2 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot,
+    aes(
+      x = fct_infreq(display_year),
+      y = height,
+      fill = cost_class,
+      pattern = pattern
+    ),
+    stat = "identity",
+    color = NA,
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 100),
+                     breaks = seq(0, 100, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost Year") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  cost_guides +
+  cost_theme() +
+  coord_flip()
+
+
+p3 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot,
+    aes(
+      x = reorder(fct_infreq(source_type), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern
+    ),
+    stat = "identity",
+    color = NA,
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 150),
+                     breaks = seq(0, 150, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost by Source Type") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  cost_guides +
+  cost_theme() +
+  coord_flip()
+
+# By cost country -- note that the not in perspective looks larger than in the other plots as those 
+# estimates were jointly reported across all of those countries.
+p4 <- ggplot() +
+  geom_bar_pattern(
+    data = x_plot %>%
+      separate_rows(locations, sep = ",") %>%
+      mutate(locations = str_trim(str_to_title(str_replace_all(locations, "_", " ")))),
+    aes(
+      x = reorder(fct_infreq(locations), cost_class),
+      y = height,
+      fill = cost_class,
+      pattern = pattern
+    ),
+    stat = "identity",
+    color = NA,
+    pattern_colour  = pattern_style$pattern_colour,
+    pattern_fill    = pattern_style$pattern_fill,
+    pattern_alpha   = pattern_style$pattern_alpha,
+    pattern_angle   = pattern_style$pattern_angle,
+    pattern_density = pattern_style$pattern_density,
+    pattern_spacing = pattern_style$pattern_spacing,
+    pattern_size    = pattern_style$pattern_size
+  ) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(limits = c(0, 120),
+                     breaks = seq(0, 120, 20),
+                     expand = c(0, 0)) +
+  xlab("Cost Country") + 
+  ylab("Cost Count") +
+  scale_fill_lancet(name = NULL) +
+  cost_guides +
+  cost_theme() +
+  coord_flip()
+
+
+patchwork_plt <- (
+  p1 / p2 / p3 / p4
+) +
+  plot_layout(ncol = 1, heights = c(3, 2, 2, 2), guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(
+    legend.position = "top",               # shared legend at top
+    plot.tag = element_text(face = "bold") # bold A/B/C/D tags
+  )
+
+ggsave("man/figures/cost_count_figure.png", patchwork_plt, width = 8, height = 12, dpi = 300)
+
+knitr::include_graphics("man/figures/cost_count_figure.png")
+```
+
+<img src="man/figures/cost_count_figure.png" width="100%" />
