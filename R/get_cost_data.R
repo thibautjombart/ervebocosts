@@ -67,7 +67,10 @@ get_cost_type <- function(x) {
 
 #' Get number of activities covered
 #' 
-#' numeric value of number of activities 
+#' Extracts the numeric value(s) indicating how many distinct activities are captured within each cost entry in the dataset.
+#' 
+#' @param x The imported database as returned by [import_data].
+#' @return A data frame (or vector) containing the number of activities associated with each cost entry, as recorded in the relevant column(s) of the input data.
 get_number_activities <- function(x) {
   to_keep <- grep("number_of_activities_captured_in_this_cost_cost_", names(x))
   out <- x[, to_keep]
